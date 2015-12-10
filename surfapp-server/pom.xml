@@ -9,7 +9,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
   <modules>
-    <module>appservices</module>
+    <module>surfapp</module>
   </modules>
     <name>surfapp-server</name>
 </project>

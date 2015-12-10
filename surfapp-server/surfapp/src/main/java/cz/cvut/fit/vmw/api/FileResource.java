@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.cvut.fit.mdw.fileserver;
+package cz.cvut.fit.vmw.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,7 +11,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import cz.cvut.fit.mdw.fileserver.support.AppFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,9 +44,9 @@ import org.apache.commons.io.FilenameUtils;
  */
 @Path("/fs")
 public class FileResource {
-    private static final String PATH = "/usr/local/share/jboss_8_1/surfphotos/";
+//    private static final String PATH = "/usr/local/share/jboss_8_1/surfphotos/";
 
-//    private static final String PATH = "/Users/jan/Documents/jboss_8_1/surfphotos/"; // macbook development path
+    private static final String PATH = "/Users/jan/Documents/jboss_8_1/surfphotos/"; // macbook development path
     private static final String LOCAL_HOST = "127.0.0.1";
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(FileResource.class.getName());
 

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html ng-app>
+    <head>
+        <title>Start Page</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.4/angular.min.js"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h1>Hello World!</h1>
+        <div ng-controller="Hello">
+            <div ng-repeat="d in data">
+                <strong >{{ d.name}}</strong>
+                <img src="api/fs/{{d.name}}"/>
+                <hr/>
+            </div>
+        </div>
+        <script>
+            function Hello($scope, $http) {
+                $http.get('http://localhost:8080/surfapp/api/fs').
+                        success(function (data) {
+                            $scope.data = data;
+                        });
+            }
+
+        </script>
+    </body>
+</html>
