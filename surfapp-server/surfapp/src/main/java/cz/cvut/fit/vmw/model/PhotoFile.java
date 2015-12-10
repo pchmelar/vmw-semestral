@@ -19,6 +19,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -51,6 +52,8 @@ public class PhotoFile implements Serializable {
     @Column(name = "create_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
+    @Transient
+    private Double similarityIndex;
 
     public PhotoFile() {
     }
