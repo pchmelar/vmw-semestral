@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Demo</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="description" content="Demo project">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
+    <script src="https://code.angularjs.org/1.2.26/angular-animate.js"></script>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <style type="text/css">
+    img {
+        opacity: 0;
+        -moz-transition: opacity 2s;
+        /* Firefox 4 */
+        -webkit-transition: opacity 2s;
+        /* Safari and Chrome */
+        -o-transition: opacity 2s;
+        transition: opacity 2s;
+    }
+    </style>
+</head>
+
+<body ng-app>
+    <div ng-controller="MyController">
+        <button type="button" ng-click="getItems()">Get Items</button>
+        <hr/>
+        <br/>
+        <img ng-repeat="item in items" src="http://localhost:8080/surfapp/api/photo/show/id/{{item.id}}" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img>
+    </div>
+</body>
+<script type="text/javascript">
+function MyController($scope, $http) {
+    $scope.items = []
+
+    $scope.getItems = function() {
+        $http({
+                method: 'GET',
+                url: 'http://localhost:8080/surfapp/api/photo',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .success(function(data, status) {
+                $scope.items = data;
+            })
+            .error(function(data, status) {
+                alert("Error");
+            })
+    }
+    $http({
+            method: 'GET',
+            url: 'http://localhost:8080/surfapp/api/photo',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .success(function(data, status) {
+            $scope.items = data;
+        })
+        .error(function(data, status) {
+            alert("Error");
+        })
+}
+</script>
+
+</html>

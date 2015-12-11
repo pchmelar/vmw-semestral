@@ -3,10 +3,10 @@ package cz.cvut.fit.vmw.integration.jpa;
 import cz.cvut.fit.vmw.integration.PhotoFileDAO;
 import cz.cvut.fit.vmw.model.PhotoFile;
 import java.util.List;
-import javax.enterprise.context.Dependent;
+import javax.ejb.Stateless;
 import javax.persistence.TypedQuery;
 
-@Dependent
+@Stateless
 public class PhotoFileDAOJPA extends AbstractDAOJPA implements PhotoFileDAO {
 
     @Override

@@ -1,26 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.cvut.fit.vmw.model;
 
+import javax.ws.rs.FormParam;
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
+
 public class UploadPhotoFile {
-    private String data;
+
+    private byte[] data;
 
     public UploadPhotoFile() {
     }
 
-    public UploadPhotoFile(String data) {
-        this.data = data;
-    }
-
-    public String getData() {
+    public byte[] getData() {
         return data;
     }
 
-    public void setData(String data) {
+    @FormParam("photo")
+    @PartType("application/octet-stream")
+    public void setData(byte[] data) {
         this.data = data;
     }
-    
+
 }

@@ -14,15 +14,12 @@ import com.google.gson.JsonSerializer;
 import cz.cvut.fit.vmw.integration.PhotoFileDAO;
 import cz.cvut.fit.vmw.model.PhotoFile;
 import cz.cvut.fit.vmw.model.UploadPhotoFile;
+import cz.cvut.fit.vmw.model.UploadPhotoFile64;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BeanParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -42,7 +38,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.commons.io.FilenameUtils;
+import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 /**
  * REST Web Service
@@ -78,6 +74,30 @@ public class PhotoResource {
         Gson gson = new GsonBuilder()
                 .serializeNulls()
                 .setPrettyPrinting()
+                .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapter(Date.class, ser)
+                .create();
+        return Response.ok(gson.toJson(result)).encoding("UTF-8").build();
+    }
+    
+    @GET
+    @Path("find10/")
+    @Produces("application/json")
+    public Response findBest10ToID(@PathParam("id") final Integer id) {
+        List<PhotoFile> result = new ArrayList<>();
+        
+        
+        
+        
+        JsonSerializer<Date> ser = new JsonSerializer<Date>() {
+            @Override
+            public JsonElement serialize(Date src, java.lang.reflect.Type typeOfSrc, JsonSerializationContext context) {
+                return src == null ? null : new JsonPrimitive(src.getTime());
+            }
+        };
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .setPrettyPrinting()
                 .registerTypeAdapter(Date.class, ser)
                 .create();
         return Response.ok(gson.toJson(result)).encoding("UTF-8").build();
@@ -101,6 +121,7 @@ public class PhotoResource {
     @GET
     @Path("show/id/{id}")
     @Produces({"image/png", "image/jpeg"})
+//        @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getPhoto(@PathParam("id") final Integer id, @Context HttpServletRequest req) {
         PhotoFile photo = photoFileDAO.find(id);
         if (photo == null) {
@@ -118,13 +139,15 @@ public class PhotoResource {
 
     @POST
     @Path("upload")
-    @Consumes("application/json")
-    public Response uploadPhoto(UploadPhotoFile photoBase64) {
-        byte[] photoData = Base64.getDecoder().decode(photoBase64.getData());
+    @Consumes("multipart/form-data")
+    @Produces("application/json")
+    public Response uploadPhoto(@MultipartForm UploadPhotoFile uploadedPhoto) {
         PhotoFile photo = new PhotoFile();
         photo.setCreateDate(new Date());
-        photo.setData(photoData);
+        photo.setData(uploadedPhoto.getData());
         photo.setId(null);
+        
+        LOG.info(uploadedPhoto.getData().toString());
         photoFileDAO.create(photo);
         List<PhotoFile> result = photoFileDAO.findAll();
         JsonSerializer<Date> ser = new JsonSerializer<Date>() {
@@ -135,11 +158,49 @@ public class PhotoResource {
         };
         Gson gson = new GsonBuilder()
                 .serializeNulls()
+                .excludeFieldsWithoutExposeAnnotation()
                 .setPrettyPrinting()
                 .registerTypeAdapter(Date.class, ser)
                 .create();
         return Response.ok(gson.toJson(result)).encoding("UTF-8").build();
     }
+    
+    @POST
+    @Path("upload64")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response uploadPhoto64(UploadPhotoFile64 photoBase64) {
+        byte[] photoData = null;
+//        try {
+//            photoData = Base64.getDecoder().decode(URLDecoder.decode(photoBase64.getData(), "UTF-8").getBytes(StandardCharsets.ISO_8859_1));
+            photoData = Base64.getDecoder().decode(photoBase64.getData().getBytes(StandardCharsets.UTF_8));
+//            Base64.getDecoder().de
+//        } catch (UnsupportedEncodingException ex) {
+//            Logger.getLogger(PhotoResource.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        PhotoFile photo = new PhotoFile();
+        photo.setCreateDate(new Date());
+        photo.setData(photoData);
+        photo.setId(null);
+        photoFileDAO.create(photo);
+        LOG.info("UPLOADED");
+        List<PhotoFile> result = photoFileDAO.findAll();
+        JsonSerializer<Date> ser = new JsonSerializer<Date>() {
+            @Override
+            public JsonElement serialize(Date src, java.lang.reflect.Type typeOfSrc, JsonSerializationContext context) {
+                return src == null ? null : new JsonPrimitive(src.getTime());
+            }
+        };
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .excludeFieldsWithoutExposeAnnotation()
+                .setPrettyPrinting()
+                .registerTypeAdapter(Date.class, ser)
+                .create();
+//        LOG.info(gson.toJson(result));
+        return Response.ok(gson.toJson(result)).encoding("UTF-8").build();
+    }
+    
 //    @PUT
 //    @Path("{name}")
 //    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
@@ -182,8 +243,5 @@ public class PhotoResource {
      * @param content representation for the resource
      * @return an HTTP response with content of the updated or created resource.
      */
-    @PUT
-    @Consumes("application/json")
-    public void putJson(String content) {
-    }
+   
 }

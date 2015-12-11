@@ -5,6 +5,7 @@
  */
 package cz.cvut.fit.vmw.model;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -37,6 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class PhotoFile implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    @Expose
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -47,13 +49,15 @@ public class PhotoFile implements Serializable {
     @Lob
     @Column(name = "data")
     private byte[] data;
+    @Expose
     @Basic(optional = false)
     @NotNull
     @Column(name = "create_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
+    @Expose
     @Transient
-    private Double similarityIndex;
+    private Double similarity;
 
     public PhotoFile() {
     }

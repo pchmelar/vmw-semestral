@@ -9,4 +9,13 @@
             30
         </session-timeout>
     </session-config>
+    <servlet>
+        <servlet-name>WADL</servlet-name>
+        <servlet-class>org.jboss.resteasy.wadl.ResteasyWadlServlet</servlet-class>
+    </servlet>
+ 
+    <servlet-mapping>
+        <servlet-name>WADL</servlet-name>
+        <url-pattern>/wadl.xml</url-pattern>
+    </servlet-mapping>
 </web-app>
