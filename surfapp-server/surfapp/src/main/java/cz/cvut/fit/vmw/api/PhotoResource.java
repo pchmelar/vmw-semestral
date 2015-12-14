@@ -15,6 +15,7 @@ import cz.cvut.fit.vmw.integration.PhotoFileDAO;
 import cz.cvut.fit.vmw.model.PhotoFile;
 import cz.cvut.fit.vmw.model.UploadPhotoFile;
 import cz.cvut.fit.vmw.model.UploadPhotoFile64;
+import cz.cvut.fit.vmw.surfapi.SURFApi;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -81,13 +82,17 @@ public class PhotoResource {
     }
     
     @GET
-    @Path("find10/")
+    @Path("find10/id/{id}")
     @Produces("application/json")
     public Response findBest10ToID(@PathParam("id") final Integer id) {
         List<PhotoFile> result = new ArrayList<>();
-        
-        
-        
+        PhotoFile orig = photoFileDAO.find(id);
+        if(orig != null){
+           List<PhotoFile> dbImages = photoFileDAO.findAll();
+           dbImages = dbImages.subList(0, 15);
+           dbImages.remove(orig);
+           result = SURFApi.findMatches2(orig, dbImages);
+        }
         
         JsonSerializer<Date> ser = new JsonSerializer<Date>() {
             @Override

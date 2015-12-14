@@ -10,6 +10,8 @@
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
     <script src="https://code.angularjs.org/1.2.26/angular-animate.js"></script>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw==" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha256-KXn5puMvxCw+dAYznun+drMdG1IFl3agK0p/pqT9KAo= sha512-2e8qq0ETcfWRI4HJBzQiA3UoyFk6tbNyG+qSaIBZLyW9Xf3sWZHN/lxe9fTh1U45DpPf07yj94KsUHHWe4Yk1A==" crossorigin="anonymous"></script>
     <style type="text/css">
     img {
         opacity: 0;
@@ -25,20 +27,28 @@
 
 <body ng-app>
     <div ng-controller="MyController">
-        <button type="button" ng-click="getItems()">Get Items</button>
+        <!-- <button type="button" ng-click="getItems()">Get Items</button> -->
+        <h1>FILE TO FIND</h1>
+        <img src="http://localhost:8080/surfapp/api/photo/show/id/25" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img>
         <hr/>
         <br/>
-        <img ng-repeat="item in items" src="http://localhost:8080/surfapp/api/photo/show/id/{{item.id}}" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img>
+        <div class="row">
+            <div class="col-md-2" ng-repeat="item in items">
+                <h5>Matches {{item.similarity}}</h5>
+                <br/>
+                <img src="http://localhost:8080/surfapp/api/photo/show/id/{{item.id}}" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img>
+            </div>
+        </div>
     </div>
 </body>
 <script type="text/javascript">
 function MyController($scope, $http) {
     $scope.items = []
-
+    
     $scope.getItems = function() {
         $http({
                 method: 'GET',
-                url: 'http://localhost:8080/surfapp/api/photo',
+                url: 'http://localhost:8080/surfapp/api/photo/find10/id/25',
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -52,7 +62,7 @@ function MyController($scope, $http) {
     }
     $http({
             method: 'GET',
-            url: 'http://localhost:8080/surfapp/api/photo',
+            url: 'http://localhost:8080/surfapp/api/photo/find10/id/25',
             headers: {
                 'Content-Type': 'application/json'
             }
