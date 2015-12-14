@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "photo_file")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "PhotoFile.findAll", query = "SELECT p FROM PhotoFile p"),
+    @NamedQuery(name = "PhotoFile.findAll", query = "SELECT p FROM PhotoFile p ORDER BY p.id ASC"),
     @NamedQuery(name = "PhotoFile.findById", query = "SELECT p FROM PhotoFile p WHERE p.id = :id"),
     @NamedQuery(name = "PhotoFile.findByCreateDate", query = "SELECT p FROM PhotoFile p WHERE p.createDate = :createDate")})
 public class PhotoFile implements Serializable, Comparable<PhotoFile> {

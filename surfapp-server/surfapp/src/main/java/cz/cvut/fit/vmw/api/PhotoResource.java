@@ -17,8 +17,6 @@ import cz.cvut.fit.vmw.model.UploadPhotoFile;
 import cz.cvut.fit.vmw.model.UploadPhotoFile64;
 import cz.cvut.fit.vmw.surfapi.SURFApi;
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -35,10 +33,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.DatatypeConverter;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 /**
@@ -80,20 +77,21 @@ public class PhotoResource {
                 .create();
         return Response.ok(gson.toJson(result)).encoding("UTF-8").build();
     }
-    
+
     @GET
     @Path("find10/id/{id}")
     @Produces("application/json")
     public Response findBest10ToID(@PathParam("id") final Integer id) {
         List<PhotoFile> result = new ArrayList<>();
         PhotoFile orig = photoFileDAO.find(id);
-        if(orig != null){
-           List<PhotoFile> dbImages = photoFileDAO.findAll();
-           dbImages = dbImages.subList(0, 15);
-           dbImages.remove(orig);
-           result = SURFApi.findMatches2(orig, dbImages);
+        if (orig != null) {
+            List<PhotoFile> dbImages = photoFileDAO.findAll();
+            dbImages = dbImages.subList(0, 15);
+            dbImages.remove(orig);
+//           result = SURFApi.findMatches2(orig, dbImages);
+            result = SURFApi.findParallel(orig, dbImages);
         }
-        
+
         JsonSerializer<Date> ser = new JsonSerializer<Date>() {
             @Override
             public JsonElement serialize(Date src, java.lang.reflect.Type typeOfSrc, JsonSerializationContext context) {
@@ -103,6 +101,7 @@ public class PhotoResource {
         Gson gson = new GsonBuilder()
                 .serializeNulls()
                 .setPrettyPrinting()
+                .excludeFieldsWithoutExposeAnnotation()
                 .registerTypeAdapter(Date.class, ser)
                 .create();
         return Response.ok(gson.toJson(result)).encoding("UTF-8").build();
@@ -151,7 +150,7 @@ public class PhotoResource {
         photo.setCreateDate(new Date());
         photo.setData(uploadedPhoto.getData());
         photo.setId(null);
-        
+
         LOG.info(uploadedPhoto.getData().toString());
         photoFileDAO.create(photo);
         List<PhotoFile> result = photoFileDAO.findAll();
@@ -169,7 +168,7 @@ public class PhotoResource {
                 .create();
         return Response.ok(gson.toJson(result)).encoding("UTF-8").build();
     }
-    
+
     @POST
     @Path("upload64")
     @Consumes("application/json")
@@ -178,7 +177,8 @@ public class PhotoResource {
         byte[] photoData = null;
 //        try {
 //            photoData = Base64.getDecoder().decode(URLDecoder.decode(photoBase64.getData(), "UTF-8").getBytes(StandardCharsets.ISO_8859_1));
-            photoData = Base64.getDecoder().decode(photoBase64.getData().getBytes(StandardCharsets.UTF_8));
+        photoData = DatatypeConverter.parseBase64Binary(photoBase64.getData());
+//            photoData = Base64.getDecoder().decode(photoBase64.getData().getBytes(StandardCharsets.UTF_8));
 //            Base64.getDecoder().de
 //        } catch (UnsupportedEncodingException ex) {
 //            Logger.getLogger(PhotoResource.class.getName()).log(Level.SEVERE, null, ex);
@@ -189,7 +189,16 @@ public class PhotoResource {
         photo.setId(null);
         photoFileDAO.create(photo);
         LOG.info("UPLOADED");
-        List<PhotoFile> result = photoFileDAO.findAll();
+        List<PhotoFile> dbImages = photoFileDAO.findAll();
+        List<PhotoFile> result = new ArrayList<>();
+        PhotoFile orig = dbImages.get(dbImages.size() - 1);
+        if (orig != null) {
+//           dbImages = dbImages.subList(0, 15);
+            dbImages.remove(orig);
+//            result = SURFApi.findMatches2(orig, dbImages);
+            result = SURFApi.findParallel(orig, dbImages);
+        }
+
         JsonSerializer<Date> ser = new JsonSerializer<Date>() {
             @Override
             public JsonElement serialize(Date src, java.lang.reflect.Type typeOfSrc, JsonSerializationContext context) {
@@ -205,7 +214,7 @@ public class PhotoResource {
 //        LOG.info(gson.toJson(result));
         return Response.ok(gson.toJson(result)).encoding("UTF-8").build();
     }
-    
+
 //    @PUT
 //    @Path("{name}")
 //    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
@@ -241,12 +250,10 @@ public class PhotoResource {
 //        return Response.ok(gson.toJson(filesResult)).encoding("UTF-8").build();
 //
 //    }
-
     /**
      * PUT method for updating or creating an instance of FileResource
      *
      * @param content representation for the resource
      * @return an HTTP response with content of the updated or created resource.
      */
-   
 }

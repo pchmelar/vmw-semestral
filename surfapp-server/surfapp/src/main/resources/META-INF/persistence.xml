@@ -3,6 +3,9 @@
   <persistence-unit name="surfappPU" transaction-type="JTA">
     <jta-data-source>java:/jboss/datasources/surfapp</jta-data-source>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
-    <properties/>
+    <properties>
+        <property name="hibernate.show-sql" value="true" />
+        <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+    </properties>
   </persistence-unit>
 </persistence>
