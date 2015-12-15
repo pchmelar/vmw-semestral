@@ -2,27 +2,27 @@
 
 ### Podobnost obrázků (SURF)
 
-Cílem bylo vytvořit mobilní aplikaci, která bude umožňovat vyhledat podobne obrázky na základě podobností pomocí metody SURF. Jednoduchým vyfocením, či vybráním obrázku mobilním telefonem se nahraje obrázek na server, kde proběhne porovnání. Server po přijetí obrázku vyhodnotí nejpodobnější obrázky a následně vrátí odpověd mobilní aplikaci. Backend server bude implementován v jazyce Java Enterprise Edition a bude poskytovat RESTFull webové služby a zároveň bude server sloužit jako databáze pro obrázky.
+Cílem bylo vytvořit mobilní aplikaci, která bude umožňovat vyhledat podobné obrázky na základě podobností pomocí metody SURF. Jednoduchým vyfocením, či vybráním obrázku mobilním telefonem se nahraje obrázek na server, kde proběhne porovnání. Server po přijetí obrázku vyhodnotí nejpodobnější obrázky a následně vrátí odpověd mobilní aplikaci. Backend server bude implementován v jazyce Java Enterprise Edition a bude poskytovat RESTFull webové služby a zároveň bude server sloužit jako databáze pro obrázky.
 
 # Implementační část - Backend server
 ### Základní specifikace
-Celý výpočet a veškerá podpora mobilní aplikace je tvořena backeckend serverem, který implementuje RESTFull API. Pro implementaci jsme zvolili programovací jazyk Java Enterprise Edition, se kterým máme pracovní zkušenosti. 
+Celý výpočet a veškerá podpora mobilní aplikace je tvořena backend serverem, který implementuje RESTFull API. Pro implementaci jsme zvolili programovací jazyk Java Enterprise Edition, se kterým máme pracovní zkušenosti. 
 
-Ikdyž je J2EE multiplatformní jazyk, finální projekt je nasazen na linuxovém serveru distribuce Debian 8.0 označený názvem Jessie. Jako aplikační server byl zvolen Wildfly 9.0.2, což je komunitní verze známějšího komerčního aplikačního serveru  JBoss.  
+I když je J2EE multiplatformní jazyk, finální projekt je nasazen na linuxovém serveru distribuce Debian 8.0 označený názvem Jessie. Jako aplikační server byl zvolen Wildfly 9.0.2, což je komunitní verze známějšího komerčního aplikačního serveru  JBoss.  
 
-Abychom si usnadnily build a deploy proces pro správu projektu jsme zvolili nástoj Maven. I přesto, že je struktura projektu vcelku jednoduchá, použití Mavenu nám usnadnilo používání již vytvořených knihoven  jako jsou například:
+Abychom si usnadnili build a deploy proces, zvolili jsme pro správu projektu nástroj Maven. I přesto, že je struktura projektu vcelku jednoduchá, použití Mavenu nám usnadnilo používání již vytvořených knihoven jako jsou například:
 - RESTEasy
     - nativní implementace RESTFull webservices pro kontejner aplikačního serveru Wildfly
 - Hibernate 
     - Java Persistence API framework používaný pro napojení relační databáze
 - BoofCV 
-    - komplexní knihovna pro získávaní dat z médií, kterou jsme využili na oné zíkávání význačných bodů (Interests points) obrazů metodou SURF
+    - komplexní knihovna pro získávaní dat z médií, kterou jsme využili na oné zíkávání význačných bodů (Interests points) obrázků metodou SURF
 - Další podpůrné knihovny 
 
 Pro ukládání obrázků jsme zvolili implementaci relační databáze známé jako MySQL. 
 
 ### Způsob ukládání a přenášení dat fotografií
-Všekeré přijaté fotografie jsou v databázi uloženy jako datový typ LONGBLOB, který se pomocí JPA interpretuje při zpracovávání jako byte array. Mobilní aplikace odesílá pouze fotografii převedenou do formátu BASE64 a znakové sady UTF-8. Aplikační server následné pracuje již se zmíněným byte array. 
+Veškeré přijaté fotografie jsou v databázi uloženy jako datový typ LONGBLOB, který se pomocí JPA interpretuje při zpracovávání jako byte array. Mobilní aplikace odesílá pouze fotografii převedenou do formátu BASE64 a znakové sady UTF-8. Aplikační server následně pracuje již se zmíněným byte array. 
 
 ### Popis webových služeb
 ```java
@@ -53,22 +53,22 @@ popis: Resource pro nahrávání fotografií ve formátu multipart/from-data. Vr
 @Path("upload64")
 @Consumes("application/json")
 @Produces("application/json")
-popis: Resource pro nahrávání fotografií ve formátu json - fotografie je zadané BASE64. Vrátí seznam fotografií seřazené dle podobnosti
+popis: Resource pro nahrávání fotografií ve formátu json - fotografie je zadaná BASE64. Vrátí seznam fotografií seřazený dle podobnosti
 ==========================================================
 ```
 ### Implementace algoritmu porovnávání fotografií
-Algoritmus pro výpočet je náseldovný:
+Algoritmus pro výpočet je následovný:
  - Pro porovnávaný obrázek napočítáme všechny descriptory (OBRAZEK1)
- - Pro ostatní obrázky, které se kterými chceme porovnávat také napočítáme descriptory
- - následně porovnáme první descriptor OBRAZKU1 se všemi descriptory provnávaného obrázku.
+ - Pro ostatní obrázky, se kterými chceme porovnávat také napočítáme descriptory
+ - následně porovnáme první descriptor OBRAZKU1 se všemi descriptory porovnávaného obrázku.
     - porovnání je provedené výpočtem vzdálenosti dvou vektorů Euklidovskou metodou
- - získané vzdálenosti seředíme od od nejmenší po největší
- - spočítáme podíl mezi první a druhou nejmenší vzdáleností a pokud je v poměr menší než námi zadaná mez zjistili  jsme shodu.
- - takto napočítáme shody pro všechny descriptory a výsledkem by měl být počet shod.
+ - získané vzdálenosti seředíme od nejmenší po největší
+ - spočítáme podíl mezi první a druhou nejmenší vzdáleností a pokud je poměr menší než námi zadaná mez, zjistili jsme shodu
+ - takto napočítáme shody pro všechny descriptory a výsledkem by měl být počet shod
  - takto napočítáme shody pro všechny obrázky vůči porovnávanému obrázku
- - výsledný seznam seřadíme a dostaneme tak nejpodobnější obrazky seřazené dle podobností
+ - výsledný seznam seřadíme a dostaneme tak nejpodobnější obrázky seřazené dle podobností
 
-Pro zvýšení rychlosti agoritmu jsme využili paralelismu a počítáme paralelně více obrázků najednou. Dosáhli jsme tím výrazného zrychlení cca 50%. Nástin algoritmu je v následující ukázce.
+Pro zvýšení rychlosti algoritmu jsme využili paralelismu a počítáme paralelně více obrázků najednou. Dosáhli jsme tím výrazného zrychlení cca 50%. Nástin algoritmu je v následující ukázce.
 ```java
 public static List<PhotoFile> findParallel(PhotoFile origPhoto, List<PhotoFile> allPhotoFiles) {
         List<PhotoFile> res = new ArrayList<>();
@@ -230,7 +230,7 @@ func imagePickerController(picker: UIImagePickerController, didFinishPickingMedi
 
 # Závěr
 
-Celkové řešení, které jsme vytvořili pokládáme za "proof of concept". Nastiňuje základní principy a implementace je v celku jednoduchá a pro publikovatelnou aplikaci by bylo třeba dodělat spousta funčností. 
+Celkové řešení, které jsme vytvořili pokládáme za "proof of concept". Nastiňuje základní principy, implementace je v celku jednoduchá a pro publikovatelnou aplikaci by bylo třeba dodělat spousta funkčností. 
 
-Největším neduhem aplikace je celkový algoritmus vyhledávání podobných obrázků, který se nedosahuje dostatečné rychlosti vyhledávání. Kdybychom to měli porovnat například se službou společnosti Google inc., tak nedosahujeme zdaleka tak dobrýchg výsledků. Nám se podařilo při porovnávání dosáhnout rychlosti vyhodnocení podobnosti jednoho obrázku zhruba za 0.4sec. Pravděpodobně služba googlu si při indexování obrázků ukládá i nějaké tagy, pomocí kterých poté následně vyhledává zároveň při porovnávání. Dalším aspektem rychlosti je výpočetní výkon serverů, který jsme bohužel pro naše řešení neměli.
+Největším neduhem aplikace je celkový algoritmus vyhledávání podobných obrázků, který nedosahuje dostatečné rychlosti vyhledávání. Kdybychom to měli porovnat například se službou společnosti Google inc., tak nedosahujeme zdaleka tak dobrých výsledků. Nám se podařilo při porovnávání dosáhnout rychlosti vyhodnocení podobnosti jednoho obrázku zhruba za 0.4sec.Služba googlu si pravděpodobně při indexování obrázků ukládá i nějaké tagy, pomocí kterých poté následně vyhledává zároveň při porovnávání. Dalším aspektem rychlosti je výpočetní výkon serverů, který jsme bohužel pro naše řešení neměli.
 
