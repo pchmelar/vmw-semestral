@@ -1,3 +1,9 @@
+# Zadaní semestrání práce a specifikace požadavků
+
+### Podobnost obrázků (SURF)
+
+Cílem bylo vytvořit mobilní aplikaci, která bude umožňovat vyhledat podobne obrázky na základě podobností pomocí metody SURF. Jednoduchým vyfocením, či vybráním obrázku mobilním telefonem se nahraje obrázek na server, kde proběhne porovnání. Server po přijetí obrázku vyhodnotí nejpodobnější obrázky a následně vrátí odpověd mobilní aplikaci. Backend server bude implementován v jazyce Java Enterprise Edition a bude poskytovat RESTFull webové služby a zároveň bude server sloužit jako databáze pro obrázky.
+
 # Implementační část - Backend server
 ### Základní specifikace
 Celý výpočet a veškerá podpora mobilní aplikace je tvořena backeckend serverem, který implementuje RESTFull API. Pro implementaci jsme zvolili programovací jazyk Java Enterprise Edition, se kterým máme pracovní zkušenosti. 
