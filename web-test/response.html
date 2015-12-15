@@ -29,16 +29,16 @@
     <div ng-controller="MyController">
         <!-- <button type="button" ng-click="getItems()">Get Items</button> -->
         <h1>FILE TO FIND</h1>
-        <!-- <img src="https://192.168.0.23:7443/surfapp/api/photo/show/id/31" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img> -->
-        <img src="http://localhost:8080/surfapp/api/photo/show/id/31" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img>
+        <img src="https://91.239.237.136:8443/surfapp/api/photo/show/id/20" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img>
+        <!-- <img src="http://localhost:8080/surfapp/api/photo/show/id/31" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img> -->
         <hr/>
         <br/>
         <div class="row">
             <div class="col-md-2" ng-repeat="item in items">
                 <h5>Matches {{item.similarity}}</h5>
                 <br/>
-                <!-- <img src="https://192.168.0.23:7443/surfapp/api/photo/show/id/{{item.id}}" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img> -->
-                <img src="http://localhost:8080/surfapp/api/photo/show/id/{{item.id}}" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img>
+                <img src="https://91.239.237.136:8443/surfapp/api/photo/show/id/{{item.id}}" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img>
+                <!-- <img src="http://localhost:8080/surfapp/api/photo/show/id/{{item.id}}" style="width:200px;margin:15px" onload="this.style.opacity='1';"></img> -->
             </div>
         </div>
     </div>
@@ -65,8 +65,8 @@ function MyController($scope, $http) {
     }
     $http({
             method: 'GET',
-            // url: 'https://192.168.0.23:7443/surfapp/api/photo/find10/id/31',
-            url: 'http://localhost:8080/surfapp/api/photo/find10/id/31',
+            url: 'https://91.239.237.136:8443/surfapp/api/photo/find10/id/20',
+            // url: 'http://localhost:8080/surfapp/api/photo/find10/id/31',
             headers: {
                 'Content-Type': 'application/json'
             }

@@ -142,12 +142,9 @@ public class SURFApi {
 
     private static List<PhotoFile> processInputs(List<PhotoFile> inputs, PhotoFile origPhoto)
             throws InterruptedException, ExecutionException {
-
         int threads = Runtime.getRuntime().availableProcessors();
         System.out.println(threads);
-
         ExecutorService service = Executors.newFixedThreadPool(threads);
-
         BufferedImage origImageBuff = getBufferedImage(origPhoto);
         ImageFloat32 origImage = new ImageFloat32(origImageBuff.getWidth(), origImageBuff.getHeight());
         origImage = ConvertBufferedImage.convertFrom(origImageBuff, origImage);
@@ -155,7 +152,6 @@ public class SURFApi {
                 surfStable(new ConfigFastHessian(0, 2, 200, 2, 9, 4, 4), null, null, ImageFloat32.class);
         surf.detect(origImage);
         final List<SurfFeature> origImageList = getSurfFeatureList(surf);
-
         List<Future<PhotoFile>> futures = new ArrayList<Future<PhotoFile>>();
         for (final PhotoFile input : inputs) {
             Callable<PhotoFile> callable = new Callable<PhotoFile>() {
@@ -170,20 +166,12 @@ public class SURFApi {
                     ImageFloat32 testImageFloat = new ImageFloat32(testImageBuff.getWidth(), testImageBuff.getHeight());
                     testImageFloat = ConvertBufferedImage.convertFrom(testImageBuff, testImageFloat);
                     surf.detect(testImageFloat);
-//                    List<SurfFeature> compare = getSurfFeatureList(surf);
                     List<SurfFeature> matches = new ArrayList<>();
-
                     for (SurfFeature sf : origImageList) {
                         List<Double> distances = new ArrayList<>();
-//                        for (SurfFeature cmp : compare) {
-//                            Double dist = DescriptorDistance.euclideanSq(sf, cmp);
-//                            distances.add(dist);
-//                        }
-                        
                         for (int i = 0 ; i< surf.getNumberOfFeatures() ; i++) {
                             distances.add(DescriptorDistance.euclideanSq(sf, surf.getDescription(i)));
                         }
-                        
                         Collections.sort(distances);
 
 //                        if (distances.get(0) == 0) {
@@ -210,9 +198,7 @@ public class SURFApi {
             };
             futures.add(service.submit(callable));
         }
-
         service.shutdown();
-
         List<PhotoFile> outputs = new ArrayList<PhotoFile>();
         for (Future<PhotoFile> future : futures) {
             outputs.add(future.get());
