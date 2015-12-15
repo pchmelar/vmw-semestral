@@ -152,9 +152,9 @@ public static List<PhotoFile> findParallel(PhotoFile origPhoto, List<PhotoFile> 
     }
 ```
 
-### Implementační část - iOS mobilní aplikace
+# Implementační část - iOS mobilní aplikace
 
-# Základní specifikace
+### Základní specifikace
 
 Jako uživatelské rozhraní jsme zvolili jednoduchou mobilní aplikaci pro systém iOS. Uživatel vyfotí, nebo vybere dříve vyfocenou fotografii, pro kterou chce v databázi najít nejpodobnější výsledky. Fotografie je odeslána na server a po provedení výpočtu jsou uživateli zobrazeny nejpodobnější výsledky.
 
@@ -168,7 +168,7 @@ Aplikace je napsána v jazyce Swift a pro svůj běh vyžaduje systém iOS verze
 - MWPhotoBrowser
     - komplexní implementace fotogalerie včetně podpory gest
 
-# Přenos dat
+### Přenos dat
 
 Nad vybranou fotografií je nejprve provedena komprese (JPEG, 0.3) a následně je převedena do formátu BASE64. Data jsou následně odeslána na server metodou POST prostřednictvím jednoduchého REST API. Po provedení výpočtu na serveru je výsledek vrácen jako odpověď na odeslaný požadavek POST.
 
@@ -218,7 +218,7 @@ func imagePickerController(picker: UIImagePickerController, didFinishPickingMedi
 }
 ```
 
-# Ukázka UI
+### Ukázka UI
 ![alt text](img/IMG_0374.PNG "MainScreen")
 ![alt text](img/IMG_0373.PNG "Results")
 
