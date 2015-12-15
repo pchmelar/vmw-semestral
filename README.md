@@ -152,6 +152,76 @@ public static List<PhotoFile> findParallel(PhotoFile origPhoto, List<PhotoFile> 
     }
 ```
 
+### Implementační část - iOS mobilní aplikace
+
+# Základní specifikace
+
+Jako uživatelské rozhraní jsme zvolili jednoduchou mobilní aplikaci pro systém iOS. Uživatel vyfotí, nebo vybere dříve vyfocenou fotografii, pro kterou chce v databázi najít nejpodobnější výsledky. Fotografie je odeslána na server a po provedení výpočtu jsou uživateli zobrazeny nejpodobnější výsledky.
+
+Aplikace je napsána v jazyce Swift a pro svůj běh vyžaduje systém iOS verze 8.0 a vyšší. Prostřednictvím balíčkovacího systému CocoaPods jsme využili několika užitečných knihoven pro usnadnění implementace:
+- Alamofire
+    - zřejmě nejpopulárnější knihovna pro síťovou komunikaci v iOS aplikacích
+- SwiftyJSON
+    - knihovna usnadňující serializaci/deserializaci dat do/z JSON formátu
+- SnapKit
+    - jednoduchá syntaktická nadstavba nativního AutoLayoutu
+- MWPhotoBrowser
+    - komplexní implementace fotogalerie včetně podpory gest
+
+# Přenos dat
+
+Nad vybranou fotografií je nejprve provedena komprese (JPEG, 0.3) a následně je převedena do formátu BASE64. Data jsou následně odeslána na server metodou POST prostřednictvím jednoduchého REST API. Po provedení výpočtu na serveru je výsledek vrácen jako odpověď na odeslaný požadavek POST.
+
+```ios
+func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]){
+    
+  //convert img to base64
+  let selectedImage = info[UIImagePickerControllerOriginalImage] as? UIImage
+  let imageData = UIImageJPEGRepresentation(selectedImage!, 0.3)
+  let base64String = imageData!.base64EncodedStringWithOptions(.EncodingEndLineWithCarriageReturn)
+
+  //prepare POST
+  let headers = [
+    "Content-Type": "application/json;charset=UTF-8"
+  ]
+  let data = [
+    "data": "\(base64String)"
+  ]
+    
+  //dismiss imagePicker
+  SVProgressHUD.showWithStatus("Loading results", maskType: SVProgressHUDMaskType.Clear)
+  self.imagePicker.dismissViewControllerAnimated(true, completion: nil)
+    
+  //send img to api
+  Alamofire.request(.POST, "https://<deploy_server_url>:8443/surfapp/api/photo/upload64", headers: headers, parameters: data, encoding: .JSON)
+    .responseJSON { response in
+        
+      switch response.result {
+          
+      case .Success:
+        if let value = response.result.value {
+          let json = JSON(value)
+          print("JSON: \(json)")
+            
+          //push results view controller
+          let resultsViewController: SAResultsViewController = SAResultsViewController(photo: selectedImage!, results: json)
+          self.navigationController!.pushViewController(resultsViewController, animated: true)
+        }
+          
+      case .Failure(let error):
+        print(error)
+        SVProgressHUD.showErrorWithStatus("Network error\nCan't send photo")
+      }
+        
+    }
+    
+}
+```
+
+# Ukázka UI
+![alt text](img/IMG_0374.PNG "MainScreen")
+![alt text](img/IMG_0373.PNG "Results")
+
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
